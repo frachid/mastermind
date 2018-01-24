@@ -7,6 +7,7 @@ public class MasterMindUtils {
 
     public static final int SECRET_LENGHT = 5;
     public static final int MAX_ESSAIE = 9;
+    public static final int MAX_ENTROPY = 5;
     public static final String TOUT_BON = SECRET_LENGHT+"V0X";
     public static final String GAGNE = "gagne";
     public static final String PERDU = "perdu";

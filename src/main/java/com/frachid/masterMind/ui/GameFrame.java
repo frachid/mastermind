@@ -10,9 +10,11 @@ import com.frachid.masterMind.business.Response;
 import static com.frachid.masterMind.business.MasterMindUtils.*;
 
 public class GameFrame extends JFrame {
+    private static final String EMPTY_STRING = "";
     private int numeroEssaie = 1;
+    private int numeroEntropy = 1;
     private boolean partieFinie = false;
-    private boolean informationTheorie = false;
+    private boolean informationTheory = true;
 
     private String secret;
     private static final int NOMBRE_BOUTON = 10;
@@ -23,6 +25,7 @@ public class GameFrame extends JFrame {
     private JButton info = new JButton("Info");
 
     private JLabel[] essaies = new JLabel[MAX_ESSAIE];
+    private JLabel[] entropies = new JLabel[MAX_ENTROPY];
 
     Font police = new Font("Arial", Font.BOLD, 20);
     private static final int FENETRE_WIDTH = 600;
@@ -31,9 +34,13 @@ public class GameFrame extends JFrame {
     private JPanel droite = new JPanel();
     private JLabel titreDroite = new JLabel();
     private JPanel tableauDEssaies = new JPanel();
-    private JScrollPane scroll = new JScrollPane(tableauDEssaies);
+    private JScrollPane scrollEssaie = new JScrollPane(tableauDEssaies);
+
     private JPanel gauche = new JPanel();
-    private JPanel haut = new JPanel();
+    private JLabel titreGauche = new JLabel();
+    private JPanel tableauDInfo = new JPanel();
+    private JScrollPane scrollInfo = new JScrollPane(tableauDInfo);
+    private JPanel infoPanel = new JPanel();
     private JPanel control = new JPanel();
     private JLabel ecran = new JLabel();
     private JPanel boutonPanel = new JPanel();
@@ -67,15 +74,67 @@ public class GameFrame extends JFrame {
         initDroite();
     }
 
+    private void initDroite() {
+
+        droite.setLayout(new BorderLayout());
+        titreDroite.setFont(police);
+        titreDroite.setHorizontalAlignment(JLabel.CENTER);
+        titreDroite.setPreferredSize(new Dimension(300, 30));
+        ecriretitreDroite();
+        droite.add(titreDroite, BorderLayout.NORTH);
+        tableauDEssaies.setBackground(Color.RED);
+        tableauDEssaies.setLayout(new GridLayout(MAX_ESSAIE, 1));
+        for (int i = 0; i < MAX_ESSAIE; i++) {
+            essaies[i] = new JLabel();
+            essaies[i].setFont(police);
+            essaies[i].setHorizontalAlignment(JLabel.CENTER);
+            essaies[i].setPreferredSize(new Dimension(300, 30));
+            tableauDEssaies.add(essaies[i]);
+        }
+        droite.add(scrollEssaie, BorderLayout.CENTER);
+    }
+
+    private void ecriretitreDroite() {
+        int essaiesRestants = (MAX_ESSAIE - numeroEssaie + 1);
+        titreDroite.setText(essaiesRestants + "Essais restant");
+    }
+
     private void initGauche() {
         gauche.setLayout(new BorderLayout());
-        haut.setBackground(Color.BLUE);
-        haut.setPreferredSize(new Dimension(300,400));
-        gauche.add(haut, BorderLayout.NORTH);
+        infoPanel.setBackground(Color.green);
+        infoPanel.setPreferredSize(new Dimension(300, 400));
+        gauche.add(infoPanel, BorderLayout.NORTH);
         control.setBackground(Color.GRAY);
         control.setPreferredSize(new Dimension(300,200));
         gauche.add(control, BorderLayout.CENTER);
         initControl();
+        initInfoPanel();
+    }
+
+    private void initInfoPanel() {
+        infoPanel.setLayout(new BorderLayout());
+        titreGauche.setFont(police);
+        titreGauche.setHorizontalAlignment(JLabel.CENTER);
+        titreGauche.setPreferredSize(new Dimension(300, 30));
+        ecriretitreGauche();
+        infoPanel.add(titreGauche, BorderLayout.NORTH);
+        tableauDInfo.setBackground(Color.BLUE);
+        tableauDInfo.setLayout(new GridLayout(MAX_ENTROPY, 1));
+        for (int i = 0; i < MAX_ENTROPY; i++) {
+            entropies[i] = new JLabel();
+            entropies[i].setFont(police);
+            entropies[i].setHorizontalAlignment(JLabel.CENTER);
+            entropies[i].setPreferredSize(new Dimension(300, 30));
+            tableauDInfo.add(entropies[i]);
+        }
+        infoPanel.add(scrollInfo, BorderLayout.CENTER);
+    }
+
+    private void ecriretitreGauche() {
+        Double neededInfo = gameSituation.getNeededInformation();
+
+        titreGauche.setText("Information Needed = " + String.format("%.2f", neededInfo));
+
     }
 
     private void initControl() {
@@ -98,7 +157,7 @@ public class GameFrame extends JFrame {
         operationPanel.setLayout(new GridLayout(1,2));
         operationPanel.add(submit);
         operationPanel.add(clear);
-        if(informationTheorie){
+        if (informationTheory) {
             operationPanel.add(info);
         }
         submit.addActionListener(e -> submit());
@@ -124,11 +183,11 @@ public class GameFrame extends JFrame {
         double informationNeeded = gameSituation.getNeededInformation();
         double entropy = essaie.getEntropy();
 
+        entropies[numeroEntropy - 1].setText("Entropy for " + guess + " : " + String.format("%.2f", entropy));
+        numeroEntropy++;
+        clear();
 
-        System.out.println("_____________________INFO________________________");
-        System.out.println("informationNeeded = " + String.format( "%.2f", informationNeeded ));
-        System.out.println("guess = "+guess);
-        System.out.println("entropy = " + String.format( "%.2f", entropy ));
+
     }
 
     private void submit() {
@@ -143,19 +202,15 @@ public class GameFrame extends JFrame {
 
         essaies[numeroEssaie-1].setText("Essai "+numeroEssaie +": " + ecran.getText() +" : "+response);
         numeroEssaie++;
-        ecran.setText("");
-        if(informationTheorie){
-            double informationNeeded = gameSituation.getNeededInformation();
-            System.out.println("informationNeeded = " + String.format( "%.2f", informationNeeded ));
+        if (informationTheory) {
+            ecriretitreGauche();
+            numeroEntropy = 1;
+            cleanPanelArray(entropies);
         }
         if(!resultat.equalsIgnoreCase(TOUT_BON)){
             if(numeroEssaie<=MAX_ESSAIE){
                 ecriretitreDroite();
-                submit.setEnabled(false);
-                info.setEnabled(false);
-                for(int i=0;i<NOMBRE_BOUTON;i++){
-                    boutons[i].setEnabled(true);
-                }
+                clear();
             }else{
                 finDePartie(false);
             }
@@ -200,9 +255,7 @@ public class GameFrame extends JFrame {
     private void toutABlanc() {
         secret = MasterMindUtils.buildSecret();
         numeroEssaie=1;
-        for(int i=0;i<MAX_ESSAIE;i++){
-            essaies[i].setText("");
-        }
+        cleanPanelArray(essaies);
         ecriretitreDroite();
 
         clear.setText("Clear");
@@ -212,36 +265,20 @@ public class GameFrame extends JFrame {
 
         ecran.setText(ecran.getText()+caracterLieAuBouton);
         if(ecran.getText().length()==SECRET_LENGHT){
-            info.setEnabled(true);
             submit.setEnabled(true);
+            if (numeroEntropy <= MAX_ENTROPY) {
+                info.setEnabled(true);
+            }
             for(int i=0;i<NOMBRE_BOUTON;i++){
                 boutons[i].setEnabled(false);
             }
         }
     }
 
-    private void initDroite() {
-
-        droite.setLayout(new BorderLayout());
-        titreDroite.setFont(police);
-        titreDroite.setHorizontalAlignment(JLabel.CENTER);
-        titreDroite.setPreferredSize(new Dimension(300,30));
-        ecriretitreDroite();
-        droite.add(titreDroite, BorderLayout.NORTH);
-        tableauDEssaies.setBackground(Color.RED);
-        tableauDEssaies.setLayout(new GridLayout(MAX_ESSAIE,1));
-        for(int i=0;i<MAX_ESSAIE;i++){
-            essaies[i]=new JLabel();
-            essaies[i].setFont(police);
-            essaies[i].setHorizontalAlignment(JLabel.CENTER);
-            essaies[i].setPreferredSize(new Dimension(300,30));
-            tableauDEssaies.add(essaies[i]);
+    private void cleanPanelArray(JLabel[] panelArray) {
+        for (JLabel label : panelArray) {
+            label.setText(EMPTY_STRING);
         }
-        droite.add(scroll, BorderLayout.CENTER);
     }
 
-    private void ecriretitreDroite() {
-        int essaiesRestants = (MAX_ESSAIE-numeroEssaie+1);
-        titreDroite.setText( essaiesRestants + "Essais restant");
-    }
 }
