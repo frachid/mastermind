@@ -2,3 +2,7 @@
 .idea/
 mastermind.iml
 out/
+build.gradle
+gradlew
+gradlew.bat
+settings.gradle
