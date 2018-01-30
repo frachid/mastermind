@@ -1,9 +1,10 @@
 package com.frachid;
 
 import com.frachid.masterMind.business.GuessComparator;
-import org.junit.*;
+import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ComparateurResponseTest {
 
@@ -11,6 +12,7 @@ public class ComparateurResponseTest {
     private static final String UN_EXACT = "1V0X";
     private static final String UN_INEXACT = "0V1X";
     private static final String DEUX_EXACT_UN_INEXACT = "2V1X";
+    private static final String UN_EXACT_UN_INEXACT = "1V1X";
     private static final String UN_EXACT_TROIS_INEXACT = "1V3X";
     private GuessComparator comparateur = new GuessComparator();
 
@@ -38,6 +40,11 @@ public class ComparateurResponseTest {
     public void test5(){
         assertTrue(DEUX_EXACT_UN_INEXACT.equalsIgnoreCase(comparateur.compareStringCombinAsString("02245","12325")) );
     }
+
+    @Test
+    public void test6() {
+        assertTrue(UN_EXACT_UN_INEXACT.equalsIgnoreCase(comparateur.compareStringCombinAsString("30047", "48082")));
+    }
     @Test
     public void testJeu()
     {
@@ -48,6 +55,7 @@ public class ComparateurResponseTest {
         assertEquals(comparateur.comparer("12345", "56340"), DEUX_EXACT_UN_INEXACT);
         assertEquals(comparateur.comparer("12345", "53248"), UN_EXACT_TROIS_INEXACT);
         assertEquals(comparateur.comparer("02245", "12325"), DEUX_EXACT_UN_INEXACT);
+        assertEquals(comparateur.comparer("30047", "48082"), UN_EXACT_UN_INEXACT);
 
     }
 }

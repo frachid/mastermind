@@ -9,6 +9,7 @@ public class GuessComparator {
     public Response compareStringCombinAsResponse(String guess, String secret){
         String result = null;
         String copySecret = secret;
+        int exist = 0;
         int exact = 0;
         int inexact = 0;
         int minLength = Math.min(guess.length(), secret.length());
@@ -16,13 +17,15 @@ public class GuessComparator {
             char c=guess.charAt(i);
             int indexOfFirstC = copySecret.indexOf(c);
             if(indexOfFirstC>=0){
+                exist++;
                 copySecret = deleteCharAt(copySecret,indexOfFirstC);
-                if(secret.charAt(i)==c){
-                    exact++;
-                }else{
-                    inexact++;
-                }
             }
+        }
+        for (int i = 0; i < minLength; i++) {
+            if (guess.charAt(i) == secret.charAt(i)) {
+                exact++;
+            }
+            inexact = exist - exact;
         }
         return new Response(exact,inexact);
     }
