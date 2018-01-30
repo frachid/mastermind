@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.frachid.masterMind.business.MasterMindUtils.EPSILON;
+
 public class InformationCalculator {
 
     private static List<Response> possibleReponses = MasterMindUtils.buildResponses();
@@ -120,5 +122,34 @@ public class InformationCalculator {
 
         gameSituation.setPossibleSolutions(newPossibleSolutions);
         essaie.setGeneratedInfo(generatedInfo);
+    }
+
+    public static String theGuessThatGivesTheBiggestEntropy(List<String> possibleSolutions) {
+        String theGuessThatGivesTheBiggestEntropy = "";
+        Double bestEntropy = 0.0;
+        List<String> possibleGuess = MasterMindUtils.buildTheoreticalSolutions();
+        for (String guess : possibleGuess) {
+            Double entropy = calculateEntropy(guess, possibleSolutions);
+            System.out.println("(guess;entropy)  : " + guess + " ; " + String.format("%.2f", entropy));
+
+            if (entropy > bestEntropy || (bestEntropy - entropy < EPSILON && possibleSolutions.contains(guess) && !possibleSolutions.contains(
+                    theGuessThatGivesTheBiggestEntropy))) {
+                theGuessThatGivesTheBiggestEntropy = guess;
+                bestEntropy = entropy;
+            }
+        }
+
+        System.out.println("_____________________________________________________________________");
+        System.out.println("________________________The Best Guess is____________________________");
+        System.out.println("_____________________________________________________________________");
+        System.out.println(theGuessThatGivesTheBiggestEntropy + " ; " + String.format("%.2f", bestEntropy));
+        System.out.println("_____________________________________________________________________");
+        if (possibleSolutions.contains(theGuessThatGivesTheBiggestEntropy)) {
+            System.out.println("________________and it is a possible solution____________________");
+        } else {
+            System.out.println("________________but it isn't a possible solution_________________");
+        }
+        return theGuessThatGivesTheBiggestEntropy;
+
     }
 }

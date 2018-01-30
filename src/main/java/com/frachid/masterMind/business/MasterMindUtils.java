@@ -11,6 +11,7 @@ public class MasterMindUtils {
     public static final String TOUT_BON = SECRET_LENGHT+"V0X";
     public static final String GAGNE = "gagne";
     public static final String PERDU = "perdu";
+    public static final Double EPSILON = 0.01;
 
 
     public static List<Response> buildResponses() {
