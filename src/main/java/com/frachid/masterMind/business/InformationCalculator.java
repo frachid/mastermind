@@ -9,7 +9,7 @@ import static com.frachid.masterMind.business.MasterMindUtils.EPSILON;
 
 public class InformationCalculator {
 
-    private static List<Response> possibleReponses = MasterMindUtils.buildResponses();
+
 
 
 
@@ -25,15 +25,9 @@ public class InformationCalculator {
                 newPossibleSolutions.add(possibleSolution);
             }
         }
-        boolean log = false;
         double probability = (double)((double)numberOfStillPossibleCombinAfterAsking/(double)numberOfStillPossibleCombinBeforAsking);
         double informationReceived = -log(probability,2);
-        if(log){
-            System.out.println("avant de poser votre question vous aviez "+numberOfStillPossibleCombinBeforAsking+" possibilites");
-            System.out.println("maintenant vous avez "+numberOfStillPossibleCombinAfterAsking+" possibilites");
-            System.out.println("la probabilite d avoir cette reponse etait de  "+probability);
-            System.out.println("vous avez alors recu une information de  "+informationReceived);
-        }
+
 
         System.out.println("informationReceived = " + String.format( "%.2f", informationReceived ));
         possibleSolutions=newPossibleSolutions;
@@ -43,6 +37,7 @@ public class InformationCalculator {
 
     public static double calculateEntropy(String guess, List<String> possibleSolutions) {
 
+        int secretLength = guess.length();
         int numberOfStillPossibleCombinBeforAsking = possibleSolutions.size();
         Map<Response,Integer> possibilityMap = buildPossibilityMap();
         for(String possibleSolution : possibleSolutions){
@@ -51,15 +46,15 @@ public class InformationCalculator {
             final Integer oldValue = possibilityMap.get(response);
             possibilityMap.put(response,oldValue+1);
         }
-        Map<Response,Double> probabilityMap = buildProbabilityMap(possibilityMap, numberOfStillPossibleCombinBeforAsking);
-        Double entropy = calculateEntropy(probabilityMap);
+        Map<Response, Double> probabilityMap = buildProbabilityMap(possibilityMap, numberOfStillPossibleCombinBeforAsking, secretLength);
+        Double entropy = calculateEntropy(probabilityMap, secretLength);
         return entropy;
 
     }
 
-    private static Double calculateEntropy(Map<Response, Double> probabilityMap) {
+    private static Double calculateEntropy(Map<Response, Double> probabilityMap, int secretLength) {
         Double entropy = 0.0;
-        for(Response possibleReponse : possibleReponses){
+        for (Response possibleReponse : MasterMindUtils.buildResponses(secretLength)) {
             double probability = probabilityMap.get(possibleReponse);
             if(probability!=0.0){
                 double information = -log(probability,2);
@@ -70,10 +65,10 @@ public class InformationCalculator {
         return entropy;
     }
 
-    private static Map<Response,Double> buildProbabilityMap(Map<Response, Integer> possibilityMap, int numberOfStillPossibleCombinBeforAsking) {
+    private static Map<Response, Double> buildProbabilityMap(Map<Response, Integer> possibilityMap, int numberOfStillPossibleCombinBeforAsking, int secretLength) {
 
         Map<Response,Double> probabilityMap = new HashMap<Response,Double>();
-        for(Response possibleReponse : possibleReponses){
+        for (Response possibleReponse : MasterMindUtils.buildResponses(secretLength)) {
             int possibilityNumber = possibilityMap.get(possibleReponse);
             double probability = (double)((double)possibilityNumber/(double)numberOfStillPossibleCombinBeforAsking);
             probabilityMap.put(possibleReponse,probability);
@@ -83,7 +78,7 @@ public class InformationCalculator {
 
     private static Map<Response,Integer> buildPossibilityMap() {
         Map<Response,Integer> possibilityMap = new HashMap<Response,Integer>();
-        for(Response possibleReponse : possibleReponses){
+        for (Response possibleReponse : MasterMindUtils.buildResponses(5)) {
             possibilityMap.put(possibleReponse,0);
         }
         return possibilityMap;
@@ -124,10 +119,10 @@ public class InformationCalculator {
         essaie.setGeneratedInfo(generatedInfo);
     }
 
-    public static String theGuessThatGivesTheBiggestEntropy(List<String> possibleSolutions) {
+    public static String theGuessThatGivesTheBiggestEntropy(List<String> possibleSolutions, int secretLength) {
         String theGuessThatGivesTheBiggestEntropy = "";
         Double bestEntropy = 0.0;
-        List<String> possibleGuess = MasterMindUtils.buildTheoreticalSolutions();
+        List<String> possibleGuess = MasterMindUtils.buildTheoreticalSolutions(secretLength);
         for (String guess : possibleGuess) {
             Double entropy = calculateEntropy(guess, possibleSolutions);
             System.out.println("(guess;entropy)  : " + guess + " ; " + String.format("%.2f", entropy));

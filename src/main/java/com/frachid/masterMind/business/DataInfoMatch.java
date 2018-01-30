@@ -1,6 +1,5 @@
 package com.frachid.masterMind.business;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +11,6 @@ public class DataInfoMatch {
 
     //Constructor
     public DataInfoMatch() {
-        possibleReponses = MasterMindUtils.buildResponses();
-        theoreticalSolutions = MasterMindUtils.buildTheoreticalSolutions();
-        possibleSolutions = MasterMindUtils.buildTheoreticalSolutions();
-        previousGuesses = new HashMap<String,Response>();
 
     }
 

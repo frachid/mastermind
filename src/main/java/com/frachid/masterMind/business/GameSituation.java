@@ -28,7 +28,7 @@ public class GameSituation {
         this.secret = secret;
     }
     public GameSituation(String secret) {
-        this.possibleSolutions = MasterMindUtils.buildTheoreticalSolutions();
+        this.possibleSolutions = MasterMindUtils.buildTheoreticalSolutions(secret.length());
         this.secret = secret;
     }
 

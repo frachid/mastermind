@@ -14,6 +14,8 @@ public class GameFrame extends JFrame {
     private boolean partieFinie = false;
 
     private String secret;
+    private int secretLength;
+    public String allCorrect = "";
     private static final int NOMBRE_BOUTON = 10;
     private String[] stringBouton = {"0","1","2","3","4","5","6","7","8","9"};
 
@@ -64,7 +66,9 @@ public class GameFrame extends JFrame {
 
 
     public GameFrame(){
-        secret = MasterMindUtils.buildSecret();
+        secretLength = 5;
+        allCorrect = secretLength + "V0X";
+        secret = MasterMindUtils.buildSecret(secretLength);
         gameSituation = new GameSituation(secret);
         this.setTitle("Master Mind");
         this.setSize(FENETRE_WIDTH, FENETRE_HEIGHT);
@@ -87,6 +91,9 @@ public class GameFrame extends JFrame {
         bg.add(length3);
         bg.add(length4);
         bg.add(length5);
+        length3.addActionListener((e -> updateSecretLength(3)));
+        length4.addActionListener((e -> updateSecretLength(4)));
+        length5.addActionListener((e -> updateSecretLength(5)));
         secretLengthMenu.add(length3);
         secretLengthMenu.add(length4);
         secretLengthMenu.add(length5);
@@ -101,12 +108,18 @@ public class GameFrame extends JFrame {
         this.setJMenuBar(menuBar);
     }
 
+    private void updateSecretLength(int newSecretLength) {
+        secretLength = newSecretLength;
+        allCorrect = secretLength + "V0X";
+        launchNewGame();
+    }
+
     private void informationTheoryActivation() {
         informationTheory = informationTheoryBox.isSelected();
         ecriretitreGauche();
         cleanPanelArray(entropies);
         best.setEnabled(informationTheory);
-        info.setEnabled(informationTheory && ecran.getText().length() == MasterMindUtils.SECRET_LENGHT);
+        info.setEnabled(informationTheory && ecran.getText().length() == secretLength);
 
     }
 
@@ -242,7 +255,7 @@ public class GameFrame extends JFrame {
 
     private void onBest() {
 
-        String best = InformationCalculator.theGuessThatGivesTheBiggestEntropy(gameSituation.getPossibleSolutions());
+        String best = InformationCalculator.theGuessThatGivesTheBiggestEntropy(gameSituation.getPossibleSolutions(), secretLength);
         Essaie essaie = new Essaie(gameSituation, best);
         double entropy = essaie.getEntropy();
         boolean isGuessAPossibleSolution = gameSituation.getPossibleSolutions().contains(best);
@@ -272,7 +285,7 @@ public class GameFrame extends JFrame {
             updateInfoPanel();
         }
 
-        if(!resultat.equalsIgnoreCase(TOUT_BON)){
+        if (!resultat.equalsIgnoreCase(allCorrect)) {
             if(numeroEssaie<=MAX_ESSAIE){
                 ecriretitreDroite();
                 onClear();
@@ -319,11 +332,13 @@ public class GameFrame extends JFrame {
     }
 
     private void launchNewGame() {
-        secret = MasterMindUtils.buildSecret();
+        secret = MasterMindUtils.buildSecret(secretLength);
         gameSituation = new GameSituation(secret);
         numeroEssaie=1;
         cleanPanelArray(essaies);
         ecriretitreDroite();
+        ecran.setText("");
+
 
         partieFinie = false;
         clear.setText("Clear");
@@ -333,7 +348,7 @@ public class GameFrame extends JFrame {
     private void addCharToResponse(String caracterLieAuBouton) {
 
         ecran.setText(ecran.getText()+caracterLieAuBouton);
-        if(ecran.getText().length()==SECRET_LENGHT){
+        if (ecran.getText().length() == secretLength) {
             submit.setEnabled(true);
             if (numeroEntropy <= MAX_ENTROPY) {
                 info.setEnabled(informationTheory);
